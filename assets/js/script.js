@@ -11,21 +11,60 @@
 // THEN I am again presented with current and future conditions for that city
 
 // define variables
-var latitude
-var longitude
-var apiKey
-var futureForecast = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
-// replac lat, lon, and api key with actual values
+
+var apiKey ="79ca4c3eecbe1377c331363aeee21c9c"
+// temperature conversion function
+// conversion rate (kelvin − 273.15) × 9/5 + 32 = temp in fahrenheit
+function convertTemp (kelvin) {
+var tempFahrenheit = (kelvin - 273.15) * 9/5 + 32;
+tempFahrenheit = tempFahrenheit.toFixed(2);
+return tempFahrenheit
+}
+// var futureForecast = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
+// replace lat, lon, and api key with actual values
 
 // Display date to html
 // User types in city and clicks a button - Event Listener
 
 document.getElementById("search").addEventListener("click", fetchCurrentWeather);
-function fetchCurrentWeather () {
+function fetchCurrentWeather (event) {
+    console.log("hi")
+    event.preventDefault()
+// User City selection needs to be stored in variable
+var city = document.getElementById("city").value
+var currentWeather = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
+fetch(currentWeather).then(function(response) {
+    return response.json()
+})
+.then(function(data) {
+console.log(data)
+var latitude = data.coord.lat
+var longitude = data.coord.lon
+var wind = data.wind.speed
+var icon = data.weather[0].icon
+var currentTempF = convertTemp (data.main.temp)
+var humidity = data.main.humidity
+document.getElementById("windspeed").textContent = wind
+document.getElementById("icon").setAttribute("src",`http://openweathermap.org/img/wn/${icon}@2x.png` )
+document.getElementById("currentTempF").textContent = `Current Temperature: ${currentTempF} degrees`
+document.getElementById("humidity").textContent = humidity
 
+
+var futureForecast = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
+fetch(futureForecast)
+.then(function(secondResponse) {
+    return secondResponse.json()
+})
+.then(function(secondData) {
+    console.log(secondData)
+})
+.catch(function(error) {
+    console.log(error)
+})
+})
 }
 
-// User City selection needs to be stored in variable
+
 // API key and query string URL and store in a variable
 // fetch current weather info from API
 // add the current weather date to each html element - temp, humidity, wind, UV 
